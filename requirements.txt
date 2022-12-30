@@ -13,6 +13,7 @@ Jinja2
 # WSI libraries
 torchstain
 python-bioformats
+h5netcdf
 
 # Ray
 ray
@@ -42,3 +43,4 @@ pdfminer.six
 openpyxl
 pytest
 hypothesis
+isort
