@@ -1,0 +1,44 @@
+prettytable
+tabulate
+seaborn
+click
+pydot
+statannotations
+pingouin
+
+# Templating
+pml
+Jinja2
+
+# WSI libraries
+torchstain
+python-bioformats
+
+# Ray
+ray
+numpy<1.24 # for ray
+scikit-learn==1.0.2
+
+# JAX tools
+jax
+#jaxlib requires reinstall
+optax
+flax
+jraph
+tensorboardx
+orbax
+jaxtyping
+
+# Dev tools
+ipyplot
+icecream
+black
+jupyter
+tqdm
+jupyterlab
+jupyterlab_code_formatter
+pdf2image
+pdfminer.six
+openpyxl
+pytest
+hypothesis

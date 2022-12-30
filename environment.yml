@@ -1,0 +1,33 @@
+name: wsi
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9.12
+  - mamba
+  - conda
+  - wget
+  - netCDF4
+  - vim
+  - tensorboard
+  - openssh
+  - tensorflow-gpu
+  - nvidia::cuda-nvcc
+  - nvidia::cuda-cudart=11 # for JAX
+  - anaconda::cudatoolkit
+  - esri::tensorflow-addons
+  - python-javabridge
+#  - cyclus::java-jre
+  - scipy
+  - pandas
+  - scikit-image
+  - matplotlib
+  - numpy<1.24 # for ray
+  - openslide
+  - openslide-python
+  - graphviz
+  - poppler
+  - pyarrow # for ray
+  - pip
+platforms:
+  - linux-64
