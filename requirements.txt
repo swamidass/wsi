@@ -44,3 +44,4 @@ openpyxl
 pytest
 hypothesis
 isort
+netcdf4
