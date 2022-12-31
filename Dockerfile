@@ -17,5 +17,9 @@ RUN conda install -n base mamba -c conda-forge && \
 
 WORKDIR /var/task
 
+COPY test* .
+
+RUN pytest 
+
 ENTRYPOINT ["/opt/conda/bin/conda", "run", "-n", "base", "--no-capture-output"]
 CMD ["/bin/bash"]
