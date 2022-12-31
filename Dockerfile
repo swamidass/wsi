@@ -21,5 +21,8 @@ COPY test* .
 
 RUN pytest 
 
+ENV TF_FORCE_GPU_ALLOW_GROWTH true
+ENV XLA_PYTHON_CLIENT_PREALLOCATE false
+
 ENTRYPOINT ["/opt/conda/bin/conda", "run", "-n", "base", "--no-capture-output"]
 CMD ["/bin/bash"]
