@@ -17,6 +17,7 @@ h5netcdf
 transformers
 tiffslide
 tifffile>=2022.10.10
+gast==0.3.3 # downgrade necessary for tensorflow Jan 1/2023
 
 # Ray
 ray[default]
