@@ -1,9 +1,13 @@
 name: wsi
+# CUDA version 11.6.0
 channels:
   - defaults
+  - nvidia
   - conda-forge
+
 dependencies:
-  - python=3.9.12
+  - python=3.9.15
+  - Pillow
   - mamba
   - conda
   - wget
@@ -11,10 +15,10 @@ dependencies:
   - vim
   - tensorboard
   - openssh
-  - tensorflow-gpu
+  - tensorflow-gpu>=2.11
   - nvidia::cuda-nvcc
-  - nvidia::cuda-cudart=11 # for JAX
-  - anaconda::cudatoolkit
+  - cuda-cudart # for JAX
+  - cudatoolkit
   - esri::tensorflow-addons
   - python-javabridge
 #  - cyclus::java-jre
@@ -23,8 +27,8 @@ dependencies:
   - scikit-image
   - matplotlib
   - numpy<1.24 # for ray
-  - openslide
-  - openslide-python
+#  - openslide
+#  - openslide-python
   - graphviz
   - poppler
   - pyarrow # for ray
