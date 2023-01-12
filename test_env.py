@@ -9,3 +9,6 @@ def test_import_PIL():
 
 def test_import_tf():
   import tensorflow as tf
+
+def test_import_keras():
+  from tensorflow import keras

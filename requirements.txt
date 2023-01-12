@@ -6,8 +6,6 @@ pydot
 statannotations
 pingouin
 
-#tensorflow reuqired
-tensorflow-protobuf
 
 # Templating
 pml
@@ -17,10 +15,14 @@ Jinja2
 torchstain
 python-bioformats
 h5netcdf
+xarray
 transformers
 tiffslide
 tifffile>=2022.10.10
 #gast==0.3.3 # downgrade necessary for tensorflow 2.4, Jan 1/2023
+
+
+protobuf==3.20.1  # for tensorflow (why???)
 
 # Ray
 ray[default]

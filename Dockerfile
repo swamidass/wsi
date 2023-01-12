@@ -11,7 +11,7 @@ ENV CONDA_OVERRIDE_CUDA 11.6.0
 RUN conda install -n base mamba -c conda-forge && \
   mamba env update -n base --file environment.yml && \
   mamba clean -ayf  && \
-  pip install -r requirements.txt --no-cache  \
+  pip install -r requirements.txt --no-cache \
     --find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
   pip cache purge && \
   chmod -R a+w /opt/conda

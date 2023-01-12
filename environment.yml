@@ -16,6 +16,7 @@ dependencies:
   - tensorboard
   - openssh
   - tensorflow-gpu>=2.11
+  - tensorflow>=2.11
   - nvidia::cuda-nvcc
   - cuda-cudart # for JAX
   - cudatoolkit
