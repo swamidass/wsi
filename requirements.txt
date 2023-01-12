@@ -25,9 +25,9 @@ tifffile>=2022.10.10
 protobuf==3.20.1  # for tensorflow (why???)
 
 # Ray
-ray[default]
+#ray[default]
 numpy<1.24 # for ray
-scikit-learn==1.0.2
+#scikit-learn==1.0.2
 
 # JAX tools
 jax

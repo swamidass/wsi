@@ -12,3 +12,9 @@ def test_import_tf():
 
 def test_import_keras():
   from tensorflow import keras
+
+
+def test_ray():
+    import ray
+    ray.init()
+    ray.shutdown()
