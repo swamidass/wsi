@@ -6,7 +6,7 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3.9.15
+  - python=3.9.12
   - Pillow
   - mamba
   - conda
@@ -15,14 +15,12 @@ dependencies:
   - vim
   - tensorboard
   - openssh
-  - tensorflow-gpu>=2.11
-  - tensorflow>=2.11
+  - tensorflow-gpu
   - nvidia::cuda-nvcc
   - cuda-cudart # for JAX
   - cudatoolkit
   - esri::tensorflow-addons
   - python-javabridge
-  - ray-all
 #  - cyclus::java-jre
   - scipy
   - pandas

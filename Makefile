@@ -23,7 +23,7 @@ push:
 	docker rmi ${DOCKER_REPO}wsi:$(DATE)
 
 shell:
-	docker run -it --rm wsi:dev
+	docker run --shm-size=10gb -it --rm wsi:dev
 
 
 clean:
