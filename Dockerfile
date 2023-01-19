@@ -6,7 +6,7 @@ COPY environment.yml environment.yml
 COPY requirements.txt requirements.txt
 
 # Necessary to enable building image with up2date tensorflow
-ENV CONDA_OVERRIDE_CUDA 11.6.0  
+ENV CONDA_OVERRIDE_CUDA 11.2.0  
 
 RUN conda install -n base mamba -c conda-forge && \
   mamba env update -n base --file environment.yml && \
@@ -27,7 +27,7 @@ ENV TF_XLA_FLAGS --tf_xla_enable_xla_devices
 ENV TF_CPP_MIN_LOG_LEVEL 3
 ENV XLA_PYTHON_CLIENT_PREALLOCATE false
 
-RUN pytest 
+#RUN pytest 
 
 ENTRYPOINT ["/opt/conda/bin/conda", "run", "-n", "base", "--no-capture-output"]
 CMD ["/bin/bash"]

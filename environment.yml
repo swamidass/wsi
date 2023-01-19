@@ -3,6 +3,7 @@ name: wsi
 channels:
   - defaults
   - nvidia
+  - anaconda
   - conda-forge
 
 dependencies:
@@ -15,10 +16,11 @@ dependencies:
   - vim
   - tensorboard
   - openssh
-  - tensorflow-gpu
+  - tensorflow-gpu=2.11
+  - flatbuffers # for tensorflow
   - nvidia::cuda-nvcc
   - cuda-cudart # for JAX
-  - cudatoolkit
+  - cudatoolkit=11.2
   - esri::tensorflow-addons
   - python-javabridge
 #  - cyclus::java-jre
