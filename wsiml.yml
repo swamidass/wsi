@@ -1,0 +1,11 @@
+name: wsiml
+channels:
+  - anaconda
+  - conda-forge
+  - default
+
+dependencies:
+  - python=3.9
+  - poetry
+  - pip
+    - poetry-dynamic-versioning

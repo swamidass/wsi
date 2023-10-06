@@ -6,9 +6,9 @@ authors = ["S. Joshua Swamidass <swamidass@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-xarray = "*"
-xarray-datatree = "*"
-tiffslide = "*"
+xarray = "^2023.9.0"
+xarray-datatree = "^0.0.12"
+tiffslide = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 click = "^8.1.3"
