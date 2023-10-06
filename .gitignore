@@ -1,1 +1,10 @@
 __pycache__
+.env
+.envrc
+*.ipynb
+*.gz
+*.nc
+*.whl
+build
+.pyc
+

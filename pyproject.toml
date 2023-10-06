@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "wsiml"
+version = "0.0"
+description = "Project to support machine learning on whole slide images. Currently a placeholder in pre-alpha."
+authors = ["S. Joshua Swamidass <swamidass@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+xarray = "*"
+xarray-datatree = "*"
+tiffslide = "*"
+
+[tool.poetry.group.dev.dependencies]
+click = "^8.1.3"
+
+[tool.poetry.plugins."xarray.backends"]
+"tiff" = "wsiml.data:TiffBackendEntrypoint"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+
+[tool.poetry-dynamic-versioning.substitution]
+folders = [{"path" = "wsiml"}]
