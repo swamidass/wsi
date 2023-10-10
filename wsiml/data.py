@@ -72,7 +72,7 @@ def _load_tiff_level(f: tiffslide.TiffSlide, fname, level : int = 0) -> xr.Datas
     x[c].encoding["add_offset"] = offset
     x[c].encoding["compression"] = "lzf"
     x[c].attrs["unit"] = "pixel"
-    x[c].attrs["mpp"] = attr[f'tiffslide.mpp-{c}']
+  
 
   return x
 
