@@ -1,0 +1,9 @@
+name: vips
+
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+  - libvips
+ 
