@@ -6,5 +6,6 @@ __pycache__
 *.nc
 *.whl
 build
+poetry.lock
 .pyc
 

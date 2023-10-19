@@ -1,0 +1,16 @@
+name: bioformats
+
+channels:
+  - defaults
+  - bioconda
+  - ome
+  - conda-forge
+
+dependencies:
+  - bioformats
+  - bftools
+# see https://www.glencoesoftware.com/blog/2019/12/09/converting-whole-slide-images-to-OME-TIFF.html
+  - bioformats2raw
+  - raw2ometiff
+
+ 

@@ -13,16 +13,17 @@ Jinja2
 
 # WSI libraries
 torchstain
-python-bioformats
+#python-bioformats
 h5netcdf
 xarray
 transformers
 tiffslide
 tifffile>=2022.10.10
+wsiml
 #gast==0.3.3 # downgrade necessary for tensorflow 2.4, Jan 1/2023
 
 
-protobuf==3.20.1  # for tensorflow (why???)
+#protobuf==3.20.1  # for tensorflow (why???)
 
 # Ray
 #ray[default]
@@ -30,14 +31,14 @@ protobuf==3.20.1  # for tensorflow (why???)
 scikit-learn
 
 # JAX tools
-jax
-jaxlib --find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
-optax
-flax
-jraph
-tensorboardx
-orbax
-jaxtyping
+# jax
+# jaxlib --find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+# optax
+# flax
+# jraph
+# tensorboardx
+# orbax
+# jaxtyping
 
 # Dev tools
 ipyplot
