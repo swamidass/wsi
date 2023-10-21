@@ -38,6 +38,9 @@ def _load_tiff_level(file_manager: CachingFileManager, fname, level : int = 0, n
   """Eagerly load a particular level of a tiff slide. Add coordinates, attributes, and set encodings
   to reasonable defaults."""
   with file_manager.acquire_context() as f:
+    n_levels = len(f.level_dimensions)
+    if level < 0: level = n_levels + level
+
     shape =  f.level_dimensions[level] #type: ignore
     downsample = f.level_downsamples[level] #type: ignore
     attr = {k: v for k,v in f.properties.items() if (v != None and "tiffslide.level" not in k)} #type: ignore
