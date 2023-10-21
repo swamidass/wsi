@@ -5,44 +5,54 @@ import xarray as xr
 from datatree import DataTree
 from typing import Optional
 
-from xarray.backends import BackendEntrypoint
+from xarray.backends import BackendArray, CachingFileManager, BackendEntrypoint
 
+
+from xarray.core import indexing
 
 def load_tiff_level(fname: str, level : int = 0) -> xr.Dataset:
   """Load specific level of a tiff slide into a xarray.Datset."""
-  with tiffslide.TiffSlide(fname) as f:
-     return _load_tiff_level(f, fname, level)
+  file_manager = CachingFileManager(tiffslide.TiffSlide, fname)
+  
+  return _load_tiff_level(file_manager, fname, level)
 
 def load_tiff_tree(fname: str) -> DataTree:
-   """Load all levels of a tiff slide into a datatree.DataTree."""
-   with tiffslide.TiffSlide(fname) as f:
-      tree = {}
-      
-      for level in range(len(f.level_downsamples)):
+  """Load all levels of a tiff slide into a datatree.DataTree."""
+  file_manager = CachingFileManager(tiffslide.TiffSlide, fname)
 
-        x = _load_tiff_level(f, fname, level)   
+  tree = {}
+  with file_manager.acquire_context() as f:
+    n_levels = len(f.level_downsamples) #type: ignore
+  
+  for level in range(n_levels):
 
-        tree["/" if level == 0 else f"level{level}"] = x
+    x = _load_tiff_level(file_manager, fname, level)   
 
-      tree = DataTree.from_dict(tree)
-      return tree
-         
+    tree["/" if level == 0 else f"level{level}"] = x
 
-def _load_tiff_level(f: tiffslide.TiffSlide, fname, level : int = 0) -> xr.Dataset:
+  tree = DataTree.from_dict(tree)
+  return tree
+
+
+def _load_tiff_level(file_manager: CachingFileManager, fname, level : int = 0, name="image") -> xr.Dataset:
   """Eagerly load a particular level of a tiff slide. Add coordinates, attributes, and set encodings
   to reasonable defaults."""
-  shape =  f.level_dimensions[level]
-   
-  downsample = f.level_downsamples[level]
-  attr = {k: v for k,v in f.properties.items() if (v != None and "tiffslide.level" not in k)}
+  with file_manager.acquire_context() as f:
+    shape =  f.level_dimensions[level] #type: ignore
+    downsample = f.level_downsamples[level] #type: ignore
+    attr = {k: v for k,v in f.properties.items() if (v != None and "tiffslide.level" not in k)} #type: ignore
 
-  assert downsample== int(downsample)
-  downsample = int(downsample)
 
-  assert attr['tiffslide.series-axes'] == "YXS"
+    assert attr['tiffslide.series-axes'] == "YXS"
+
+  x = TiffSlideArray(file_manager, level)
+  x = indexing.LazilyIndexedArray(x)
+
+  if downsample== int(downsample):
+    downsample = int(downsample)
 
   offset = (downsample - 1) / 2 if downsample > 1 else 0
-  stride = int(downsample)
+  stride = downsample
 
   coords = {
       'y': ('y', np.arange(shape[1]) * stride + offset),
@@ -50,7 +60,6 @@ def _load_tiff_level(f: tiffslide.TiffSlide, fname, level : int = 0) -> xr.Datas
       'rgb': ("rgb", ['r', 'g', 'b']),
     }
 
-  x = f.read_region((0,0), level, shape, as_array=True)
   x = xr.DataArray(
     x,
     dims=('y', 'x', 'rgb'), 
@@ -60,18 +69,24 @@ def _load_tiff_level(f: tiffslide.TiffSlide, fname, level : int = 0) -> xr.Datas
   x.encoding["chunksizes"] = (256, 256, 1)
   x.encoding["compression"] = "lzf"
 
-  x = x.to_dataset(name="image")
+  
+
+  x = x.to_dataset(name=name)
   x.attrs.update(attr)
 
   if type(fname) == str:
     x.attrs["source_file"] = fname
-    x["image"].attrs["source_file"] = fname
+    x[name].attrs["source_file"] = fname
 
   for c in 'xy':
     x[c].encoding["scale_factor"] = stride
     x[c].encoding["add_offset"] = offset
     x[c].encoding["compression"] = "lzf"
-    x[c].attrs["unit"] = "pixel"
+    x[c].attrs["units"] = "pixel"
+    try:
+      x[c].attrs["mpp"] = x.attrs[f'tiffslide.mpp-{c}']
+    except KeyError: pass
+  
   
 
   return x
@@ -96,7 +111,7 @@ class TiffBackendEntrypoint(BackendEntrypoint):
         drop_variables = None,
     ):
         assert type(level) == int
-        return load_tiff_level(filename_or_obj)
+        return load_tiff_level(filename_or_obj, level)
         
 
     def guess_can_open(self, filename_or_obj):
@@ -105,3 +120,78 @@ class TiffBackendEntrypoint(BackendEntrypoint):
         except TypeError:
             return False
         return ext in self.EXTENSIONS
+
+
+class TiffSlideArray(BackendArray):
+    def __init__(
+        self,
+        file : CachingFileManager, 
+        level = 0,
+    ):
+        self.dtype = np.uint8
+        self.level = level
+        self.file = file        
+
+        with self.file.acquire_context() as slide:
+          dims = slide.level_dimensions[level] # (x, y)
+          self.shape = (dims[1], dims[0], 3) # (y, x, c)
+      
+
+
+    def __getitem__(
+        self, key: indexing.ExplicitIndexer
+    ): # -> np.typing.ArrayLike:
+        return indexing.explicit_indexing_adapter(
+            key,
+            self.shape,
+            indexing.IndexingSupport.BASIC,
+            self._raw_indexing_method,
+        )
+
+    def _raw_indexing_method(self, key: tuple) :#-> np.typing.ArrayLike:
+        # thread safe method that access to data on disk
+
+        minmax = []
+        offset_key = []
+
+        for n, k in enumerate(key[:2]):
+          if type(k) == int:
+            if k < 0: k = self.shape[n] - k
+            minmax.append((k, k))
+            offset_key.append(0)
+
+          if type(k) == slice:
+            start = k.start if k.start is not None else 0
+            stop = k.stop if k.stop is not None else self.shape[n] - 1
+
+            minmax.append((start, stop))
+
+
+            offset_key.append(
+              slice(
+                k.start - start if start else start, 
+                k.stop - start if start else k.stop,
+                k.step)
+              )
+
+        offset_key = tuple(offset_key + list(key[2:]))
+            
+        with self.file.acquire_context() as slide:
+          region = slide.read_region( #type: ignore
+            (
+              minmax[1][0], # origin (x, y)
+              minmax[0][0]
+            ), 
+            self.level, 
+            (
+              minmax[1][1] - minmax[1][0] + 1,  # size (x, y)
+              minmax[0][1] - minmax[0][0] + 1
+            ), 
+            as_array=True)
+        
+        out =  region[offset_key]
+
+        return out
+            
+        
+              
