@@ -4,10 +4,12 @@ from typing import NamedTuple, Any, Optional, Union, Callable, Sequence
 import numpy as np
 import math
 
+import tree
+
 KerasModel = Any
 
 
-class RegularGrid(NamedTuple):
+class RegularGrid:
     """Follows the same semantics as ITK.
     https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html"""
 
@@ -15,9 +17,73 @@ class RegularGrid(NamedTuple):
     spacing: float | int = 1
     size: int | None = None
 
+    def __init__(self, origin: float | int = 0, spacing: float | int = 1, size: int | None = None):
+        self._origin = origin
+        self._spacing = spacing
+        self._size = size
+
+    # def __repr__(self):
+    #     return f"{self.__class__.__name__}(origin={self._origin}, spacing={self._spacing}, size={self._size})"
+
+    # @property
+    # def origin(self) -> float | int:
+    #     return self._origin
+
+    # @property
+    # def spacing(self) -> float | int:
+    #     return self._spacing
+
+    # @property
+    # def size(self) -> int | None:
+    #     return self._size
+
+    # def _repr_inline_(self, max_width):
+    #     return repr(self)
+    
+    @property
+    def shape(self) -> tuple[int]:
+        if isinstance(self.size, int):
+            return (self.size,)
+
+        raise NotImplementedError
+
+    @property
+    def ndim(self) -> int:
+        return 1
+
+    @property
+    def dtype(self) -> np.dtype:
+        if isinstance(self.origin, int) and isinstance(self.spacing, int):
+            return np.dtype("int")
+        else:
+            return np.dtype("float")
+        
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.origin == other.origin and self.spacing == other.spacing and self.size == other.size
+        return False
+
+    def __array_function__(self, func, types, args: tuple, kwargs: dict):
+        print(func)
+        if func in HANDLED_FUNCTIONS:
+            try:
+                return HANDLED_FUNCTIONS[func](*args, **kwargs)
+            except NotImplementedError:
+                pass
+
+        args, kwargs = nested_cast_to_array(args, kwargs, dtype=self.__class__)
+        return func(*args, **kwargs)
+
+
+    def __array_ufunc__(self, func, types, args: tuple, kwargs: dict):
+        return NotImplemented
+    
+    def __array_namespace__(self, *, api_version = None):
+        return np
+    
     @classmethod
     def from_coord(cls, coord: Sequence[float], maybe_cast_to_int=False) -> RegularGrid:
-        """Assumes coordinate is a regularly spaced sequence of numbers."""
+        """Assumes coordinate is a regularly spaced sequence of numbers. TODO: add checks and relax this assumption"""
         s = coord[1] - coord[0]
         if maybe_cast_to_int:
             s = int(s) if int(s) == s else s
@@ -31,6 +97,10 @@ class RegularGrid(NamedTuple):
 
     def __array__(self):
         return np.arange(0, self.size) * self.spacing + self.origin
+    
+    # @property
+    # def data(self):
+    #     return self
 
     def to_numpy(self) -> np.ndarray:
         assert self.size
@@ -60,6 +130,9 @@ class RegularGrid(NamedTuple):
         except:
             raise NotImplemented
 
+    def __len__(self):
+        return self.size
+
     def __truediv__(self, other):
         try:
             return RegularGrid(
@@ -76,16 +149,19 @@ class RegularGrid(NamedTuple):
         except:
             raise NotImplemented
 
-
     def __rmul__(self, other):
         try:
             return RegularGrid(
-                origin=other * self.origin , spacing=other * self.spacing, size=self.size
+                origin=other * self.origin, spacing=other * self.spacing, size=self.size
             )
         except:
             raise NotImplemented
-        
-    def __getitem__(self, key: int | slice):
+
+
+    def __getitem__(self, key: int | slice | tuple[int | slice]):
+        if isinstance(key, tuple):
+            key = key[0]
+
         if isinstance(key, int):
             if self.size is not None:
                 if key < 0:
@@ -114,7 +190,7 @@ class RegularGrid(NamedTuple):
 
             return RegularGrid(origin=origin, spacing=spacing, size=size)
 
-        raise KeyError
+        raise KeyError(key)
 
     def to_slice(self) -> slice:
         return slice(
@@ -157,7 +233,6 @@ class DownSamplerShape(NamedTuple):
 
     def minimum_size(self) -> int:
         return self.padding * 2 + self.odd
-
 
     @classmethod
     def from_function(
@@ -226,3 +301,59 @@ def _keras_config_change_padding(config: dict, padding: str = "valid"):
         return config
 
     return config
+
+
+def nested_cast_to_array(*struct, dtype=RegularGrid) -> tuple:
+    cache = {}
+
+    def caster(x):
+        if isinstance(x, RegularGrid):
+            i = id(x)
+            if i not in cache:
+                cache[i] = np.asarray(x)
+            return cache[i]
+
+    return tree.traverse(caster, struct)  # type: ignore
+
+
+HANDLED_FUNCTIONS = {}
+
+
+def implements(np_function):
+    "Register an __array_function__ implementation for DiagonalArray objects."
+
+    def decorator(func):
+        HANDLED_FUNCTIONS[np_function] = func
+        return func
+
+    return decorator
+
+
+@implements(np.concatenate)
+def concatenate(X: Sequence, axis=0, out=None, **kwargs):
+    if axis != 0:
+        raise NotImplemented
+    if out is not None:
+        raise NotImplemented
+
+    for x in X:
+        if not isinstance(x, RegularGrid):
+            raise NotImplemented
+
+    if len(X) == 1:
+        return X[0]
+
+    i = X[0]
+
+    for x in X[1:]:
+        if x.size == 0:
+            continue
+        if i.size is None:
+            raise NotImplementedError
+        if not np.isclose(x.spacing, i.spacing):
+            raise NotImplementedError
+        if not np.isclose(x.origin, i.origin + i.size * i.spacing):
+            raise NotImplementedError
+        i = RegularGrid(i.origin, i.spacing, i.size + x.size)
+
+    return i
