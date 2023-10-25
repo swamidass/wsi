@@ -11,11 +11,13 @@ class RegisterWSI:
   def __init__(self):
     self.params = itkparams_to_dicts(get_default_params())
 
+
   def fit(self, fixed : xr.DataArray, moving : xr.DataArray):
+    
     fixed = xarray_downsample(fixed, self.downsample) # type: ignore
     moving = xarray_downsample(moving, self.downsample) # type: ignore
 
-    reg, trans, self.elastix = fit_transform(fixed, moving, dicts_to_itkparams(self.params))
+    reg, trans, self.elastix = fit_transform(fixed, moving, dicts_to_itkparams(self.params)) # type: ignore
     self.transform = itkparams_to_dicts(trans) # type: ignore
     return reg
   
