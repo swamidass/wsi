@@ -9,9 +9,12 @@ python = "^3.9"
 xarray = "^2023.9.0"
 xarray-datatree = "^0.0.12"
 tiffslide = "^2.2.0"
-itk-elastix = "^0.19.0"
 tiffslide-xarray = "^0.1a0"
 tree = "^0.2.4"
+itk-elastix = { version =  "^0.19.0", optional = true }
+
+[tool.poetry.extras]
+register = ["itk-elastix"]
 
 [tool.poetry.group.dev.dependencies]
 click = "^8.1.3"
