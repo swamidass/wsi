@@ -9,7 +9,7 @@ import tree
 KerasModel = Any
 
 
-class RegularGrid:
+class RegularGrid(NamedTuple):
     """Follows the same semantics as ITK.
     https://simpleitk.readthedocs.io/en/master/fundamentalConcepts.html"""
 
@@ -17,10 +17,10 @@ class RegularGrid:
     spacing: float | int = 1
     size: int | None = None
 
-    def __init__(self, origin: float | int = 0, spacing: float | int = 1, size: int | None = None):
-        self._origin = origin
-        self._spacing = spacing
-        self._size = size
+    # def __init__(self, origin: float | int = 0, spacing: float | int = 1, size: int | None = None):
+    #     self._origin = origin
+    #     self._spacing = spacing
+    #     self._size = size
 
     # def __repr__(self):
     #     return f"{self.__class__.__name__}(origin={self._origin}, spacing={self._spacing}, size={self._size})"
