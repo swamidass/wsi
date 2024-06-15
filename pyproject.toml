@@ -9,7 +9,7 @@ python = "^3.9"
 xarray = "^2023.9.0"
 xarray-datatree = "^0.0.12"
 tiffslide = "^2.2.0"
-tiffslide-xarray = "^0.1a0"
+tiffslide-xarray = "^0.1"
 itk-elastix = { version =  "^0.19.0", optional = true }
 dm-tree = "^0.1.8"
 
