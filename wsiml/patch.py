@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import NamedTuple, Any, Optional, Union, Callable, Sequence
+from typing import NamedTuple, Any, Callable, Sequence
 import numpy as np
-import math
+
 
 import tree
 
