@@ -43,7 +43,7 @@ class TAESD:
         self, x: xr.DataArray, approx_patch_size: int = 1500 * 2
     ) -> xr.DataArray:
         processed = []
-        slicers = list(self.dss.parition(x, approx_patch_size))
+        slicers = list(self.dss.partition(x, approx_patch_size))
         for slicer in tqdm.tqdm(slicers):
             patch = x[slicer]
             pred = self.predict(patch)
