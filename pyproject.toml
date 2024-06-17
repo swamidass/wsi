@@ -5,24 +5,24 @@ description = "Project to support machine learning on whole slide images. Curren
 authors = ["S. Joshua Swamidass <swamidass@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-xarray = "^2023.9.0"
-xarray-datatree = "^0.0.12"
-tiffslide = "^2.2.0"
-tiffslide-xarray = "^0.1"
+python = ">=3.9,<4"
+xarray = ">=2023.9.0"
+xarray-datatree = ">=0.0.12"
+tiffslide = ">=2.2.0"
+tiffslide-xarray = ">=0.2" # required
 # itk-elastix = { version =  "^0.19.0", optional = true }
-dm-tree = "^0.1.8"
+dm-tree = ">=0.1.8"
 # onnxruntime = "^1.18.0"
-pooch = "^1.8.2"
-data-science-types = "^0.2.23"
+pooch = ">=1.8.2"
+data-science-types = ">=0.2.23"
 
 [tool.poetry.extras]
 # register = ["itk-elastix"]
 
 [tool.poetry.group.dev.dependencies]
 click = "^8.1.3"
-pytest = "^7.4.2"
-hypothesis = "^6.88.1"
+pytest = ">=7.4.2"
+hypothesis = ">=6.88.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
