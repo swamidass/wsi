@@ -1,3 +1,6 @@
+tensorflow[and-cuda]
+keras_cv
+
 prettytable
 tabulate
 seaborn
@@ -18,6 +21,7 @@ h5netcdf
 xarray
 transformers
 tiffslide
+tiffslide_xarray
 tifffile>=2022.10.10
 wsiml
 #gast==0.3.3 # downgrade necessary for tensorflow 2.4, Jan 1/2023

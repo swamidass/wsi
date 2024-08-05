@@ -2,18 +2,25 @@ FROM continuumio/miniconda3:4.12.0 as builder
 
 WORKDIR /var/task
 
-COPY environment.yml environment.yml
-COPY requirements.txt requirements.txt
+
 
 # Necessary to enable building image with up2date tensorflow
-ENV CONDA_OVERRIDE_CUDA 11.2.0  
+ENV CONDA_OVERRIDE_CUDA  11.2.0  
 
-RUN conda install -n base mamba libarchive=3.5.2=hb890918_2  conda-forge::ncurses -c conda-forge && \
+RUN conda install -n base mamba python=3.11.9 -c conda-forge && \
   chmod -R a+w /opt/conda
 
+# libarchive=3.5.2=hb890918_2  conda-forge::ncurses 
+
+COPY environment.yml environment.yml
+
 RUN  mamba env update -n base --file environment.yml && \
-  mamba clean -ayf  && \
-  pip install -r requirements.txt --no-cache \
+  mamba clean -ayf && \
+  chmod -R a+w /opt/conda 
+
+COPY requirements.txt requirements.txt
+
+RUN  pip install -r requirements.txt --no-cache \
 #    --find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
   pip cache purge && \
   chmod -R a+w /opt/conda

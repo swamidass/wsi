@@ -7,19 +7,19 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3.9.12
+  - python=3.11.9
   - Pillow
   - mamba
   - conda
   - wget
   - netCDF4
-  - xarray
+    #  - xarray
   - vim
-  - tensorboard
+    #  - tensorboard
   - openssh
-  - tensorflow
-  - tensorflow-gpu=2.11
-  - flatbuffers # for tensorflow
+    #- tensorflow
+    #  - tensorflow-gpu # =2.11
+    # - flatbuffers # for tensorflow
 #  - nvidia::cuda-nvcc
 #  - cuda-cudart # for JAX
 #  - cudatoolkit=11.2
@@ -30,8 +30,8 @@ dependencies:
   - pandas
   - scikit-image
   - matplotlib
-  - libarchive=3.5.2=hb890918_2
-#  - numpy<1.24 # for ray
+    #  - libarchive=3.5.2=hb890918_2
+    # - numpy<1.24 # for ray
 #  - openslide
 #  - openslide-python
  # - pyarrow # for ray
