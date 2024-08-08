@@ -1,46 +1,72 @@
-from typing import NamedTuple
+from __future__ import annotations
 
-class ModelShape(NamedTuple):
-  pad : int
-  stride : int
+from typing import Any, Generator
+import numpy as np
+import xarray as xr
+from tiffslide_xarray.grid import RegularGrid, DownSamplerShape
+from itertools import product
 
-def model_shape(size_function, start : int= 1024) -> ModelShape:
-  breaks = []
-  i = start
-  last = size_function(i)
-  while len(breaks) < 2:
-    this = size_function(i)
-    if this != last:
-      breaks.append((i, this))
-    last = this
-    i += 1
+KerasModel = Any
 
-  stride = breaks[1][0] - breaks[0][0]
-  min_size = breaks[1][0]  - (breaks[1][1] - 1)  * stride
-  pad = min_size // 2
-  return ModelShape(stride=stride, pad=pad)
+def _partition(self, dss: DownSamplerShape,  approx_size: int)   -> Generator[slice, Any, None]:
+    size = self.size
+    assert size is not None
 
-   
+    splits = max(1, int(np.rint(size / approx_size))) #type: ignore
+    spacing = dss.stride
+    padding = dss.padding * 2 + dss.odd
 
-def _keras_config_change_padding(config, padding="valid"):
-  """
-  Convert Keras model config into an equivalent config that uses "valid."
-  """
-  
-  if isinstance(config, list):
-    return [_keras_config_change_padding(x) for x in config]
+    stride = (size - padding) // (splits * spacing) * spacing
+    strid_mod = (size - padding) % (splits * spacing) // spacing
 
-  if isinstance(config, tuple):
-    return tuple([_keras_config_change_padding(x) for x in config])
+    patch_size = stride + padding
 
-  if isinstance(config, dict):
-    if "padding" in config:
-      config["padding"] = padding
-  
-    for k in list(config):
-      config[k] = _keras_config_change_padding(config[k])
-    
-    return config
-  
-  return config
-      
+    for i in range(splits):
+        patch_size = stride + padding + (spacing if i < strid_mod else 0)
+        start = i * stride + spacing * min(i, strid_mod)
+        end = start + patch_size
+        yield slice(start, end)
+
+# monkey patch Regular Grid with new method
+RegularGrid.partition = _partition
+
+def _partition_image(
+    self: DownSamplerShape,
+    D: xr.DataArray,
+    approx_patch_size: int = 1500 * 2,
+):
+    """
+    Compute patches that partition input image and can be downsampled and combined into a single image identical
+    to running downsampler on the full image.
+
+    Parameters
+    ----------
+    dss : wsiml.patch.DownSamplerShape
+        The downsampler shape to define the overlap between tiles.
+    D : xr.DataArray
+        The data array to partition.
+    approx_patch_size : int, optional
+        The target patch size to aim for, by default 3000
+
+    Yields
+    ------
+    Generator[dict[Hashable, slice], None, None]
+        slicers to index the data array into patches that can be downsampled andcombined by coordinates.
+
+    """
+    g = D.wsi.grids
+    dims = D.dims[:2]
+
+    for i, j in product(
+        g[dims[0]].partition(self, approx_patch_size),
+        g[dims[1]].partition(self, approx_patch_size),
+    ):
+        slicer = {
+            dims[0]: i,
+            dims[1]: j,
+        }
+        yield slicer
+
+
+# monkey patch with new method
+DownSamplerShape.partition = _partition_image
