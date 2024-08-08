@@ -5,7 +5,7 @@ WORKDIR /var/task
 
 
 # Necessary to enable building image with up2date tensorflow
-ENV CONDA_OVERRIDE_CUDA  11.2.0  
+ENV CONDA_OVERRIDE_CUDA 11.2.0  
 
 RUN conda install -n base mamba python=3.11.9 -c conda-forge && \
   chmod -R a+w /opt/conda
@@ -20,7 +20,7 @@ RUN  mamba env update -n base --file environment.yml && \
 
 COPY requirements.txt requirements.txt
 
-RUN  pip install -r requirements.txt --no-cache \
+RUN  pip install -r requirements.txt --no-cache && \
 #    --find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html && \
   pip cache purge && \
   chmod -R a+w /opt/conda

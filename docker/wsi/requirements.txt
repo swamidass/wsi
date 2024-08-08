@@ -1,6 +1,11 @@
-tensorflow[and-cuda]
-keras_cv
+#tensorflow[with-cuda]==2.15
+#keras_cv
+Pillow
+scikit-image
+scipy
 
+pandas
+matplotlib
 prettytable
 tabulate
 seaborn
