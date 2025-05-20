@@ -58,7 +58,8 @@ typer
 ipyplot
 humanize
 icecream
-black
+ruff
+
 
 tqdm
 
@@ -72,4 +73,5 @@ ipykernel
 ipywidgets
 jupyter>=1.1
 jupyterlab
+jupyter-ruff
 # jupyterlab_code_formatter

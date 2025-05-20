@@ -8,11 +8,12 @@ all: docker-dev
 
 docker-dev: environment.yml requirements.txt
 	echo ${HASH}
-	docker build -f Dockerfile . -t wsi:dev
+	docker build --platform=linux/amd64 -f Dockerfile . -t wsi:dev
 
 push:
 	docker tag wsi:dev ${DOCKER_REPO}wsi:dev
 	docker push ${DOCKER_REPO}wsi:dev
+	docker rmi ${DOCKER_REPO}wsi:dev
 	
 	docker tag wsi:dev  ${DOCKER_REPO}wsi:$(HASH)
 	docker push ${DOCKER_REPO}wsi:$(HASH)
@@ -27,5 +28,6 @@ shell:
 
 
 clean:
+	-docker rmi wsi:dev
 	docker image prune -f
 	docker builder prune -f
