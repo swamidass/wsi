@@ -1,0 +1,75 @@
+Pillow
+scikit-image
+scikit-learn
+shapely
+scipy
+pyarrow
+pandas
+matplotlib
+prettytable
+tabulate
+seaborn
+click
+typer
+pydot
+statannotations
+pingouin
+
+einops
+einx
+
+# config
+# git+https://github.com/swamidass/hydra-once.git
+hydra-core
+git+https://github.com/swamidass/hydra-once.git
+
+
+# Templating
+pml
+Jinja2
+
+# WSI libraries
+torchstain
+tiffslide
+tiffslide_xarray
+tifffile>=2022.10.10
+
+#python-bioformats
+h5netcdf
+xarray
+
+#pytorch
+lightning
+torchvision
+transformers
+
+lightly
+tiffslide
+x-transformers
+timm
+vit-pytorch
+
+
+wsiml
+comet_ml
+typer
+
+# notebook
+ipyplot
+humanize
+icecream
+black
+
+tqdm
+
+openpyxl
+pytest
+hypothesis
+isort
+netcdf4
+
+ipykernel
+ipywidgets
+jupyter>=1.1
+jupyterlab
+# jupyterlab_code_formatter

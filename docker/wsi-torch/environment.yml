@@ -1,0 +1,24 @@
+name: wsi-torch
+
+channels:
+  - conda-forge
+
+dependencies:
+  - mamba
+  - python=3.11.11
+  - sqlite
+  - conda
+  - wget
+  - netCDF4
+  - vim
+  - make
+  - openssh
+  - pytorch >= 2.5
+  - nvidia::cuda-nvcc
+  - pip
+  - uv
+  - cuda=12.4
+  - numcodecs
+
+platforms:
+  - linux-64
